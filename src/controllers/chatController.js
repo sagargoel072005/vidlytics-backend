@@ -1,21 +1,16 @@
-const Chat =
-    require("../models/Chat");
+const Chat = require("../models/Chat");
+const {searchChunks} = require("../services/ragService");
+const { getEmbedding} = require("../services/embeddingService");
+const { GoogleGenAI } =
+require("@google/genai");
 
-const {
-    searchChunks
-}
-    =
-    require("../qdrant/search");
-
-exports.askQuestion =
-    async (req, res) => {
-
-        const {
-            videoId,
-            question
-        }
-            =
-            req.body;
+const ai =
+new GoogleGenAI({
+  apiKey:
+  process.env.GEMINI_API_KEY
+});
+exports.askQuestion =async (req, res) => { 
+    const {videoId,question } =  req.body;
 
         const history =
             await Chat.find({
@@ -25,12 +20,21 @@ exports.askQuestion =
                 .sort({ createdAt: -1 })
                 .limit(10);
 
+        const questionEmbedding =
+            await getEmbedding(question);
+
         const chunks =
             await searchChunks(
                 videoId,
-                question
+                questionEmbedding
             );
-
+console.log(
+ JSON.stringify(
+   chunks,
+   null,
+   2
+ )
+);
         const context =
             chunks
                 .map(c => c.payload.text)
@@ -60,13 +64,14 @@ Answer using only context.
 
 `;
 
-        const result =
-            await model.generateContent(
-                prompt
-            );
+      const result =
+await ai.models.generateContent({
+  model: "gemini-2.5-flash",
+  contents: prompt
+});
 
-        const answer =
-            result.response.text();
+const answer =
+result.text;
 
         await Chat.create({
             userId: req.user.id,

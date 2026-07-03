@@ -1,8 +1,7 @@
 const Comparison = require("../models/Comparision");
 const { getTranscript, } = require("../services/transcriptService");
 const { compareVideos, } = require("../services/geminiService");
-const { comparisonQueue } = require("../queues/comparisonQueue");
-
+const comparisonQueue = require("../queues/comparisonQueue");
 exports.compareVideosController =
   async (req, res) => {
 

@@ -1,9 +1,9 @@
 const { Worker } = require("bullmq");
-const { connection } = require("../queues/comparisonQueue");
+const redis = require("../config/redis");
 const Comparison = require("../models/Comparision");
 const { getTranscript } = require("../services/transcriptService");
 const { compareVideos } = require("../services/geminiService");
-const { sendProgress } = require("../sse/sseManager");
+const { sendProgress } = require("../utils/sseManager");
 const { saveTranscriptToQdrant } = require("../services/embeddingService");
 
 new Worker(
@@ -64,7 +64,9 @@ new Worker(
                 aiResult: null
 
             });
-
+        console.log(
+            "Saving transcript to Qdrant..."
+        );
         await saveTranscriptToQdrant(
             comparison._id.toString(),
             transcript1
@@ -74,6 +76,10 @@ new Worker(
             comparison._id.toString(),
             transcript2
         );
+        console.log(
+            "Qdrant save complete"
+        );
+
         const result =
             await compareVideos(
                 transcript1,
@@ -82,19 +88,7 @@ new Worker(
         comparison.aiResult = result;
 
         await comparison.save();
-        await Comparison.create({
 
-            userId,
-
-            video1,
-            video2,
-
-            transcript1,
-            transcript2,
-
-            aiResult: result
-
-        });
 
         sendProgress(
             job.id,
@@ -109,7 +103,7 @@ new Worker(
     },
 
     {
-        connection
+        connection: redis
     }
 
 );

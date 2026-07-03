@@ -1,8 +1,9 @@
 require("dotenv").config();
+require("./workers/comparisonWorker");
 const express = require("express");
 const cookieParser = require("cookie-parser");
 const connectDB = require("./config/database");
-
+const cors = require("cors");
 const app = express();
 
 const authRouter = require("./routes/auth");
@@ -10,8 +11,14 @@ const transcriptRouter = require("./routes/transcript");
 const comparisionRouter =require("./routes/comparision");
 const chatRouter = require("./routes/chat");
 const sseRouter = require("./routes/sse");
-const {createCollection}=require("./config/qdrant");
-
+const profileRouter = require("./routes/profile");
+const {createCollection}=require("./services/qdrantService");
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  })
+);
 app.use(express.json());
 app.use(cookieParser());
 
@@ -20,7 +27,7 @@ app.use("/",transcriptRouter);
 app.use("/",comparisionRouter);
 app.use("/",chatRouter);
 app.use("/",sseRouter);
-
+app.use("/",profileRouter);
 
 connectDB()
   .then(async () => {

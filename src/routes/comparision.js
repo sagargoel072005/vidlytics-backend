@@ -2,8 +2,7 @@ const express = require("express");
 
 const comparisionRouter = express.Router();
 
-const { userAuth } =
-    require("../middlewares/auth");
+const { userAuth } =require("../middlewares/auth");
 
 const {
 
@@ -32,13 +31,13 @@ comparisionRouter.get(
 );
 
 comparisionRouter.get(
-    "/:id",
+    "/history/:id",
     userAuth,
     getSingleComparison
 );
 
 comparisionRouter.delete(
-    "/:id",
+    "/history/:id",
     userAuth,
     deleteComparison
 );

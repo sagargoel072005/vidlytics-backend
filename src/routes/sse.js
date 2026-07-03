@@ -1,7 +1,7 @@
 const express =require("express");
 const sseRouter = express.Router();
 
-const {addClient, removeClient}= require("../sse/sseManager");
+const {addClient, removeClient}= require("../utils/sseManager");
 
 sseRouter.get( "/:jobId/progress",(req, res) => {
 
@@ -31,5 +31,34 @@ sseRouter.get( "/:jobId/progress",(req, res) => {
         );
 
     });
+    
+// const { sendProgress } =
+// require("../utils/sseManager");
+
+// sseRouter.get(
+//   "/trigger/:jobId",
+//   (req,res)=>{
+
+//     sendProgress(
+//       req.params.jobId,
+//       {
+//         progress:50,
+//         message:"Testing"
+//       }
+//     );
+//      sendProgress(
+//       req.params.jobId,
+//       {
+//         progress:100,
+//         message:"Testing 3"
+//       }
+//     );
+
+//     res.json({
+//       success:true
+//     });
+
+//   }
+// );
 
 module.exports = sseRouter;

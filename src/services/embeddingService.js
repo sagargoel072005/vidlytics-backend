@@ -1,6 +1,4 @@
-const {
-    GoogleGenerativeAI
-} = require("@google/generative-ai");
+const { GoogleGenAI } = require("@google/genai");
 
 const {
   client: qdrantClient
@@ -15,7 +13,7 @@ const COLLECTION =
     "video_chunks";
 
 const genAI =
-    new GoogleGenerativeAI(
+    new GoogleGenAI(
         process.env.GEMINI_API_KEY
     );
 
@@ -42,22 +40,15 @@ function chunkText(
     return chunks;
 }
 
-async function getEmbedding(
-    text
-) {
+async function getEmbedding(text) {
 
-    const model =
-        genAI.getGenerativeModel({
-            model:
-                "text-embedding-004"
-        });
+  const response =
+    await genAI.models.embedContent({
+      model: "gemini-embedding-001",
+      contents: text,
+    });
 
-    const result =
-        await model.embedContent(
-            text
-        );
-
-    return result.embedding.values;
+  return response.embeddings[0].values;
 }
 
 async function saveTranscriptToQdrant(
@@ -67,6 +58,10 @@ async function saveTranscriptToQdrant(
 
     const chunks =
         chunkText(transcript);
+            console.log(
+      "Chunks:",
+      chunks.length
+    );
 
     const points = [];
 
@@ -95,6 +90,16 @@ async function saveTranscriptToQdrant(
 
         });
     }
+
+        console.log(
+      "Points:",
+      points.length
+    );
+
+    console.log(
+      "Uploading to Qdrant..."
+    );
+
 
     await qdrantClient.upsert(
         COLLECTION,

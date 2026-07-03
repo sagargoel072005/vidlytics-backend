@@ -7,6 +7,12 @@ const redis = new IORedis({
   maxRetriesPerRequest: null,
   tls: {}
 });
+redis.on("connect", () => {
+  console.log("✅ Redis Connected");
+});
+
+redis.on("error", (err) => {
+  console.log("❌ Redis Error:", err.message);
+});
 
 module.exports = redis;
-
