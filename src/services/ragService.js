@@ -4,41 +4,51 @@ const {
 
 
 const COLLECTION =
-"video_chunks";
+  "video_chunks";
 
 async function searchChunks(
- videoId,
- questionEmbedding
-){
-console.log(typeof questionEmbedding);
-console.log(questionEmbedding?.length);
-console.log(questionEmbedding);
- const result =
- await qdrantClient.search(
-  COLLECTION,
-  {
-   vector:questionEmbedding,
+  videoId,
+  questionEmbedding
+) {
+  try {
 
-   limit:5,
+    const result =
+      await qdrantClient.search(
+        COLLECTION,
+        {
+          vector: questionEmbedding,
+          limit: 5,
+          filter: {
+            must: [
+              {
+                key: "videoId",
+                match: {
+                  value: videoId
+                }
+              }
+            ]
+          }
+        }
+      );
 
-  //  filter:{
-  //   must:[
-  //    {
-  //     key:"videoId",
-  //     match:{
-  //      value:videoId
-  //     }
-  //    }
-  //   ]
-  //  }
+    return result;
+
+  } catch (err) {
+
+    console.log(
+      "FULL ERROR =>",
+      err
+    );
+
+    console.log(
+      "ERROR JSON =>",
+      JSON.stringify(err, null, 2)
+    );
+
+    throw err;
   }
- );
-
- return result;
 }
 
-
-
 module.exports = {
- searchChunks
+  searchChunks
 };

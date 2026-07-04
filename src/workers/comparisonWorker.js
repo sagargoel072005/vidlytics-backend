@@ -24,7 +24,8 @@ new Worker(
             job.id,
             {
                 progress: 10,
-                message: "Transcript 1"
+                message: "Transcript 1",
+            
             }
         );
 
@@ -46,7 +47,7 @@ new Worker(
             job.id,
             {
                 progress: 60,
-                message: "Gemini Analysis"
+                message: "vidlytics Analysis"
             }
         );
 
@@ -64,9 +65,9 @@ new Worker(
                 aiResult: null
 
             });
-        console.log(
-            "Saving transcript to Qdrant..."
-        );
+        // console.log(
+        //     "Saving transcript to Qdrant..."
+        // );
         await saveTranscriptToQdrant(
             comparison._id.toString(),
             transcript1
@@ -76,9 +77,9 @@ new Worker(
             comparison._id.toString(),
             transcript2
         );
-        console.log(
-            "Qdrant save complete"
-        );
+        // console.log(
+        //     "Qdrant save complete"
+        // );
 
         const result =
             await compareVideos(
@@ -94,7 +95,8 @@ new Worker(
             job.id,
             {
                 progress: 100,
-                message: "Completed"
+                message: "Completed",
+                comparisonId: comparison._id
             }
         );
 

@@ -34,6 +34,28 @@ async function createCollection() {
         );
 
     }
+
+    try {
+
+        await client.createPayloadIndex(
+            "video_chunks",
+            {
+                field_name: "videoId",
+                field_schema: "keyword"
+            }
+        );
+
+        console.log(
+            " videoId index created"
+        );
+
+    } catch (err) {
+
+        console.log(
+            "videoId index already exists"
+        );
+
+    }
 }
 
 module.exports = {

@@ -8,11 +8,11 @@ const redis = new IORedis({
   tls: {}
 });
 redis.on("connect", () => {
-  console.log("✅ Redis Connected");
+  console.log("Redis Connected");
 });
 
 redis.on("error", (err) => {
-  console.log("❌ Redis Error:", err.message);
+  console.log("Redis Error:", err.message);
 });
 
 module.exports = redis;
