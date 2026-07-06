@@ -13,6 +13,7 @@ const chatRouter = require("./routes/chat");
 const sseRouter = require("./routes/sse");
 const profileRouter = require("./routes/profile");
 const {createCollection}=require("./services/qdrantService");
+
 app.use(
   cors({
     origin: "http://localhost:5173",

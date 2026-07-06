@@ -24,9 +24,10 @@ const userSchema = new mongoose.Schema(
         },
         password: {
             type: String,
-            required:true,
+            required: true,
         },
-    }
+    },
+    { timestamps: true }
 )
 userSchema.methods.getJWT = async function () {
     const token = await jwt.sign({ _id: this._id }, process.env.JWT_TOKEN, {
@@ -34,6 +35,6 @@ userSchema.methods.getJWT = async function () {
     });
     return token;
 };
-const UserModel = mongoose.model("User", userSchema);
+const UserModel = mongoose.models.User || mongoose.model("User", userSchema);
 
 module.exports = UserModel;

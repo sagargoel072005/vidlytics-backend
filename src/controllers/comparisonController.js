@@ -15,7 +15,14 @@ exports.compareVideosController =
           userId: req.user.id,
           video1,
           video2
-        }
+        },
+        {
+    attempts: 3,
+    backoff: {
+      type: "exponential",
+      delay: 5000, // 5s, phir 10s, phir 20s
+    },
+  }
       );
 
     res.json({

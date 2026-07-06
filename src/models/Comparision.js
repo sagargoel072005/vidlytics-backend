@@ -28,14 +28,13 @@ const comparisonSchema = new mongoose.Schema(
 
     aiResult:{
         type:Object
-    }
+    },
+    duration: { type: Number }, 
 },
 {
     timestamps:true
 }
 );
 
-module.exports = mongoose.model(
-    "Comparison",
-    comparisonSchema
-);
+module.exports =
+    mongoose.models.Comparison || mongoose.model("Comparison", comparisonSchema);
