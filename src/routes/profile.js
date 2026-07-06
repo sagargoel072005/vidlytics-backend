@@ -2,7 +2,7 @@ const express = require("express");
 const bcrypt = require("bcryptjs");
 const validator = require("validator");
 const { userAuth } = require("../middlewares/auth");
-const User = require("../models/user");
+const User = require("../models/User");
 const Comparison = require("../models/comparision");
 
 const profileRouter = express.Router();
