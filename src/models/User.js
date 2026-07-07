@@ -24,7 +24,28 @@ const userSchema = new mongoose.Schema(
         },
         password: {
             type: String,
-            required: true,
+            required: function () { return this.authProvider === "local"; },
+            validate(value) {
+                if (this.authProvider === "google") return true;
+                if (!validator.isStrongPassword(value)) throw new Error("Invalid Password: " + value);
+            },
+        },
+        authProvider: {
+            type: String,
+            enum: ["local", "google"],
+            default: "local",
+        },
+
+
+        photoUrl: { type: String, default: "" },
+        gender: {
+            type: String,
+            enum: ["male", "female", "other"],
+        },
+        age: {
+            type: Number,
+            min: 13,
+            max: 120,
         },
     },
     { timestamps: true }

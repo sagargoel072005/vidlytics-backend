@@ -1,11 +1,13 @@
 require("dotenv").config();
 require("./workers/comparisonWorker");
+require("./config/passport");
 const express = require("express");
+const passport = require("passport");
 const cookieParser = require("cookie-parser");
 const connectDB = require("./config/database");
 const cors = require("cors");
 const app = express();
-
+app.use(passport.initialize());
 const authRouter = require("./routes/auth");
 const transcriptRouter = require("./routes/transcript");
 const comparisionRouter =require("./routes/comparision");

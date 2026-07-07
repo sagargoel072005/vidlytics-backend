@@ -4,6 +4,9 @@ const validator = require("validator");
 const { userAuth } = require("../middlewares/auth");
 const User = require("../models/User");
 const Comparison = require("../models/comparision");
+const Upload = require("../middlewares/upload");
+const cloudinary = require("../config/cloudinary");
+const fs = require("fs");
 
 const profileRouter = express.Router();
 
@@ -76,11 +79,10 @@ profileRouter.get("/profile/stats", userAuth, async (req, res) => {
   }
 });
 
-
 // PATCH /profile/edit
 profileRouter.patch("/profile/edit", userAuth, async (req, res) => {
   try {
-    const ALLOWED_UPDATES = ["firstName", "lastName", "emailId"];
+    const ALLOWED_UPDATES = ["firstName", "lastName", "gender", "age"];
 
     const isEditAllowed = Object.keys(req.body).every((field) =>
       ALLOWED_UPDATES.includes(field)
@@ -88,10 +90,6 @@ profileRouter.patch("/profile/edit", userAuth, async (req, res) => {
 
     if (!isEditAllowed) {
       throw new Error("Update not allowed on these fields");
-    }
-
-    if (req.body.emailId && !validator.isEmail(req.body.emailId)) {
-      throw new Error("Invalid Email Id");
     }
 
     const user = req.user;
@@ -133,5 +131,32 @@ profileRouter.patch("/profile/password", userAuth, async (req, res) => {
     res.status(400).send("ERROR: " + err.message);
   }
 });
+
+profileRouter.post( "/profile/upload-photo",
+  userAuth,
+  Upload.single("photo"),
+  async (req, res) => {
+    try {
+      if (!req.file) throw new Error("No file uploaded");
+
+      const filePath = req.file.path.replace(/\\/g, "/");
+      const result = await cloudinary.uploader.upload(filePath, {
+        folder: "profile_photos",
+        transformation: [{ width: 400, height: 400, crop: "fill", gravity: "face" }],
+      });
+
+      // Clean up temp file
+      try { fs.unlinkSync(req.file.path); } catch {}
+
+      req.user.photoUrl = result.secure_url;
+      await req.user.save();
+
+      res.json(req.user);
+    } catch (err) {
+      console.error("PHOTO UPLOAD ERROR:", err);
+      res.status(500).send({ error: err.message });
+    }
+  }
+);
 
 module.exports = profileRouter;

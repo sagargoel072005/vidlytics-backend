@@ -2,7 +2,7 @@ const express = require("express");
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const { validateSignUpData } = require("../utils/validation");
-
+const passport = require("passport");
 const authRouter = express.Router();
 
 authRouter.post("/signup", async (req, res) => {
@@ -82,6 +82,30 @@ authRouter.post("/logout", async (req, res) => {
     });
     res.send("logout successfull!!!!");
 })
+
+
+authRouter.get(
+    "/auth/google",
+    passport.authenticate("google", { scope: ["profile", "email"] })
+);
+
+authRouter.get(
+    "/auth/google/callback",
+    passport.authenticate("google", { session: false }),
+    async (req, res) => {
+
+        const user = req.user;
+
+        const token = await user.getJWT();
+
+        res.cookie("token", token, {
+            expires: new Date(Date.now() + 8 * 3600000)
+        });
+
+        res.redirect("https://vidlytics.sagargoel.shop/dashboard");
+
+    }
+);
 
 
 module.exports = authRouter;
