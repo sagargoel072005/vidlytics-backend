@@ -14,8 +14,8 @@ sseRouter.get( "/:jobId/progress",(req, res) => {
             "Cache-Control",
             "no-cache"
         );
-        res.setHeader("Connection", "keep-alive");
-        res.setHeader("X-Accel-Buffering", "no");
+        // res.setHeader("Connection", "keep-alive");
+        // res.setHeader("X-Accel-Buffering", "no");
 
         const { jobId } =
             req.params;
