@@ -1,5 +1,6 @@
 require("dotenv").config();
 require("./workers/comparisonWorker");
+require("./workers/studyWorker");
 require("./config/passport");
 const express = require("express");
 const passport = require("passport");
@@ -14,6 +15,7 @@ const comparisionRouter =require("./routes/comparision");
 const chatRouter = require("./routes/chat");
 const sseRouter = require("./routes/sse");
 const profileRouter = require("./routes/profile");
+const studyRouter = require("./routes/studyRoutes");
 const {createCollection}=require("./services/qdrantService");
 
 app.use(
@@ -34,6 +36,7 @@ app.use("/",comparisionRouter);
 app.use("/",chatRouter);
 app.use("/",sseRouter);
 app.use("/",profileRouter);
+app.use("/", studyRouter);
 
 connectDB()
   .then(async () => {
