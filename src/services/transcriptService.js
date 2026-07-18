@@ -37,6 +37,30 @@ const vttToPlainText = (vtt) => {
   return text.replace(/\b(\w[\w']*(?:\s+\w[\w']*){0,4})\s+\1\b/gi, "$1");
 };
 
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+// YouTube's caption-serving CDN (timedtext) rate-limits aggressively under
+// repeated testing. Retry with backoff instead of failing the whole job on
+// a transient 429.
+const fetchCaptionsWithRetry = async (url, retries = 3) => {
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    const res = await fetch(url);
+
+    if (res.ok) {
+      return res.text();
+    }
+
+    if (res.status === 429 && attempt < retries) {
+      const waitMs = 2000 * Math.pow(2, attempt); // 2s, 4s, 8s
+      console.log(`⏳ Captions 429, retrying in ${waitMs / 1000}s... (${retries - attempt} left)`);
+      await sleep(waitMs);
+      continue;
+    }
+
+    throw new Error(`Failed to download captions (status ${res.status}).`);
+  }
+};
+
 /**
  * Fetches the transcript for a YouTube video via yt-dlp.
  * Throws a descriptive Error if the video has no usable captions or the
@@ -105,12 +129,7 @@ exports.getTranscript = async (videoUrl) => {
     throw new Error("No English captions are available for this video.");
   }
 
-  const res = await fetch(track.url);
-  if (!res.ok) {
-    throw new Error(`Failed to download captions (status ${res.status}).`);
-  }
-
-  const vtt = await res.text();
+  const vtt = await fetchCaptionsWithRetry(track.url);
   const text = vttToPlainText(vtt);
 
   if (!text) {

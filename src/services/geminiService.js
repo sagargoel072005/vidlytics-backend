@@ -10,6 +10,9 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 exports.compareVideos = async (transcript1, transcript2, retries = 3) => {
     const model = genAI.getGenerativeModel({
         model: "gemini-2.5-flash",
+         generationConfig: {
+      responseMimeType: "application/json",
+    },
     });
 
     const prompt = `
@@ -48,11 +51,12 @@ Return JSON:
     }
 };
 
-// ── Add this to the existing geminiService.js, below exports.compareVideos ──
-
 exports.generateStudyMaterial = async (transcript, retries = 3) => {
   const model = genAI.getGenerativeModel({
     model: "gemini-2.5-flash",
+      generationConfig: {
+      responseMimeType: "application/json",
+    },
   });
 
   const prompt = `
@@ -111,3 +115,4 @@ Rules:
     throw err;
   }
 };
+
