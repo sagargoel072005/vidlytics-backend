@@ -102,7 +102,7 @@ authRouter.get(
             expires: new Date(Date.now() + 8 * 3600000)
         });
 
-        res.redirect("https://vidlytics.sagargoel.shop/dashboard");
+        res.redirect("https://vidlyticsapp.netlify.app/dashboard");
 
     }
 );
