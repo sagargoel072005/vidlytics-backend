@@ -22,7 +22,7 @@ app.use(
   cors({
     origin: [
       "http://localhost:5173",
-      "https://vidlytics.sagargoel.shop"
+      "https://vidlyticsapp.netlify.app/"
     ],
     credentials: true,
   })
