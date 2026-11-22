@@ -21,6 +21,11 @@ const fetchVideoTitle = async (videoUrl) => {
   }
 };
 
+const updateJobProgress = async (job, data) => {
+  await job.updateProgress(data);
+  sendProgress(job.id, data);
+};
+
 const worker = new Worker(
   "studyQueue",
 
@@ -30,14 +35,15 @@ const worker = new Worker(
     let studySession;
 
     try {
-      sendProgress(job.id, { progress: 10, message: "Fetching video info" });
+     
+      await updateJobProgress(job, { progress: 10, message: "Fetching video info" });
       const videoTitle = await fetchVideoTitle(videoUrl);
 
-      sendProgress(job.id, { progress: 25, message: "Fetching transcript" });
+      await updateJobProgress(job, { progress: 25, message: "Fetching transcript" });
       const transcript = await getTranscript(videoUrl);
       console.log("✅ Transcript fetched, length:", transcript?.length);
 
-      sendProgress(job.id, { progress: 50, message: "Saving session" });
+      await updateJobProgress(job, { progress: 50, message: "Saving session" });
 
       studySession = await StudySession.create({
         userId,
@@ -57,7 +63,7 @@ const worker = new Worker(
         console.error("⚠️ Qdrant save failed (non-fatal):", qdrantErr.message);
       }
 
-      sendProgress(job.id, { progress: 70, message: "Generating study kit" });
+     await updateJobProgress(job, { progress: 70, message: "Generating study kit" });
 
       console.log("⏳ Calling Gemini...");
       const result = await generateStudyMaterial(transcript);
@@ -67,7 +73,7 @@ const worker = new Worker(
       await studySession.save();
       console.log("✅ aiResult saved to DB");
 
-      sendProgress(job.id, {
+    await updateJobProgress(job, {
         progress: 100,
         message: "Completed",
         studyId: studySession._id.toString(),
@@ -78,7 +84,7 @@ const worker = new Worker(
       console.error("❌ Study job failed:", err.message);
       console.error(err);
 
-      sendProgress(job.id, {
+      await updateJobProgress(job, {
         progress: 100,
         error: true,
         message: err.message || "Study session generation failed",
