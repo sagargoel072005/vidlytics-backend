@@ -39,6 +39,7 @@ const sseRouter = express.Router();
 
 const { addClient, removeClient } = require("../utils/sseManager");
 const comparisonQueue = require("../queues/comparisonQueue");
+const studyQueue = require("../queues/studyQueue");
 
 sseRouter.get("/:jobId/progress", async (req, res) => {
   const { jobId } = req.params;
@@ -66,11 +67,18 @@ sseRouter.get("/:jobId/progress", async (req, res) => {
 
   // Recover progress events that happened before SSE connected
   try {
-    const job = await comparisonQueue.getJob(jobId);
+let job =
+  await studyQueue.getJob(jobId);
 
-    if (job && job.progress) {
-      res.write(`data: ${JSON.stringify(job.progress)}\n\n`);
-    }
+if (!job) {
+  job = await comparisonQueue.getJob(jobId);
+}
+
+if (job && job.progress) {
+  res.write(
+    `data: ${JSON.stringify(job.progress)}\n\n`
+  );
+}
   } catch (err) {
     console.error("SSE progress recovery error:", err.message);
   }
