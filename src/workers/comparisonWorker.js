@@ -70,11 +70,17 @@ const worker = new Worker(
       await comparison.save();
       console.log("✅ aiResult saved to DB");
 
-      sendProgress(job.id, {
-        progress: 100,
-        message: "Completed",
-        comparisonId: comparison._id.toString(),
-      });
+      // sendProgress(job.id, {
+      //   progress: 100,
+      //   message: "Completed",
+      //   comparisonId: comparison._id.toString(),
+      // });
+
+      await updateJobProgress(job, {
+  progress: 100,
+  message: "Completed",
+  comparisonId: comparison._id.toString(),
+});
 
       return result;
     } catch (err) {
@@ -88,11 +94,12 @@ const worker = new Worker(
       //   message: err.message || "Comparison failed",
       //   comparisonId: comparison?._id?.toString() || null,
       // });
-
-      await updateJobProgress(job, {
+await updateJobProgress(job, {
   progress: 100,
-  message: "Completed",
-  comparisonId: comparison._id.toString(),
+  error: true,
+  message: err.message || "Comparison failed",
+  comparisonId: comparison?._id?.toString() || null,
+});
 });
 
       throw err; // BullMQ ko job failed mark karne do
