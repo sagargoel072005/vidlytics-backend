@@ -6,6 +6,11 @@ const { compareVideos } = require("../services/geminiService");
 const { sendProgress } = require("../utils/sseManager");
 const { saveTranscriptToQdrant } = require("../services/embeddingService");
 
+const updateJobProgress = async (job, data) => {
+  await job.updateProgress(data);
+  sendProgress(job.id, data);
+};
+
 const worker = new Worker(
   "comparisonQueue",
 
@@ -15,15 +20,27 @@ const worker = new Worker(
     let comparison;
 
     try {
-      sendProgress(job.id, { progress: 10, message: "Transcript 1" });
+      //sendProgress(job.id, { progress: 10, message: "Transcript 1" });
+      await updateJobProgress(job, {
+  progress: 10,
+  message: "Transcript 1",
+});
       const transcript1 = await getTranscript(video1);
       console.log("✅ Transcript 1 fetched, length:", transcript1?.length);
 
-      sendProgress(job.id, { progress: 30, message: "Transcript 2" });
+      // sendProgress(job.id, { progress: 30, message: "Transcript 2" });
+      await updateJobProgress(job, {
+  progress: 30,
+  message: "Transcript 2",
+});
       const transcript2 = await getTranscript(video2);
       console.log("✅ Transcript 2 fetched, length:", transcript2?.length);
 
-      sendProgress(job.id, { progress: 60, message: "Vidlytics Analysis" });
+     // sendProgress(job.id, { progress: 60, message: "Vidlytics Analysis" });
+      await updateJobProgress(job, {
+  progress: 60,
+  message: "Vidlytics Analysis",
+});
 
       comparison = await Comparison.create({
         userId,
@@ -65,12 +82,18 @@ const worker = new Worker(
       console.error("❌ Comparison job failed:", err.message);
       console.error(err); // full stack trace
 
-      sendProgress(job.id, {
-        progress: 100,
-        error: true,
-        message: err.message || "Comparison failed",
-        comparisonId: comparison?._id?.toString() || null,
-      });
+      // sendProgress(job.id, {
+      //   progress: 100,
+      //   error: true,
+      //   message: err.message || "Comparison failed",
+      //   comparisonId: comparison?._id?.toString() || null,
+      // });
+
+      await updateJobProgress(job, {
+  progress: 100,
+  message: "Completed",
+  comparisonId: comparison._id.toString(),
+});
 
       throw err; // BullMQ ko job failed mark karne do
     }
