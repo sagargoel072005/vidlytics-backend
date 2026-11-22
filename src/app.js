@@ -8,6 +8,7 @@ const cookieParser = require("cookie-parser");
 const connectDB = require("./config/database");
 const cors = require("cors");
 const app = express();
+app.set("trust proxy", 1);
 app.use(passport.initialize());
 const authRouter = require("./routes/auth");
 const transcriptRouter = require("./routes/transcript");
@@ -16,7 +17,8 @@ const chatRouter = require("./routes/chat");
 const sseRouter = require("./routes/sse");
 const profileRouter = require("./routes/profile");
 const studyRouter = require("./routes/studyRoutes");
-const {createCollection}=require("./services/qdrantService");
+// const {createCollection}=require("./services/qdrantService");
+const { createCollection } = require("./config/qdrant");
 
 app.use(
   cors({
