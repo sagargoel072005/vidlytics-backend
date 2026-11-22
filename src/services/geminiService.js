@@ -88,6 +88,21 @@ Return ONLY valid JSON in exactly this shape (no markdown, no commentary):
   ]
 }
 
+
+MERMAID FLOWCHART RULES:
+- Generate valid Mermaid.js flowchart syntax.
+- Use flowchart TD.
+- Keep every node declaration on a single line.
+- Always wrap node labels in double quotes.
+- Use only simple alphanumeric node IDs such as A, B, C1.
+- For decision nodes, use: A{"Decision label"}.
+- Never put raw line breaks inside node labels.
+- Replace & with and inside labels.
+- Avoid unescaped special characters.
+- Do not include markdown code fences.
+- Return only the Mermaid diagram.
+
+
 Rules:
 - Generate 5-8 notes sections covering the main topics in order they appear.
 - Generate exactly 5 quiz questions, testing different concepts, increasing in difficulty.
