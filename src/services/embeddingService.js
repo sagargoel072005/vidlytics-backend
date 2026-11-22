@@ -40,13 +40,24 @@ function chunkText(
     return chunks;
 }
 
-async function getEmbedding(text) {
+// async function getEmbedding(text) {
 
-  const response =
-    await genAI.models.embedContent({
-      model: "gemini-embedding-001",
-      contents: text,
-    });
+//   const response =
+//     await genAI.models.embedContent({
+//       model: "gemini-embedding-001",
+//       contents: text,
+//     });
+
+//   return response.embeddings[0].values;
+// }
+async function getEmbedding(text) {
+  const response = await genAI.models.embedContent({
+    model: "gemini-embedding-001",
+    contents: text,
+    config: {
+      outputDimensionality: 768,
+    },
+  });
 
   return response.embeddings[0].values;
 }
