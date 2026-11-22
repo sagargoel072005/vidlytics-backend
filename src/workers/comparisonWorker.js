@@ -100,7 +100,6 @@ await updateJobProgress(job, {
   message: err.message || "Comparison failed",
   comparisonId: comparison?._id?.toString() || null,
 });
-});
 
       throw err; // BullMQ ko job failed mark karne do
     }
